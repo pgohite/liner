@@ -33,6 +33,7 @@ type commonState struct {
 	maxRows           int
 	shouldRestart     ShouldRestart
 	needRefresh       bool
+	helpProvider      HelpProvider
 }
 
 // TabStyle is used to select how tab completions are displayed.
@@ -187,6 +188,14 @@ type Completer func(line string) []string
 // to the completer which may returns ("Hello, ", {"world", "Word"}, "!!!") to have "Hello, world!!!".
 type WordCompleter func(line string, pos int) (head string, completions []string, tail string)
 
+// HelpProvider defines signature for help completion callback
+type HelpProvider func(line string)
+
+// SetHelpProvider set helpProvider callback
+func (s *State) SetHelpProvider(f HelpProvider) {
+	s.helpProvider = f
+}
+
 // SetCompleter sets the completion function that Liner will call to
 // fetch completion candidates when the user presses tab.
 func (s *State) SetCompleter(f Completer) {
@@ -252,4 +261,9 @@ func (s *State) promptUnsupported(p string) (string, error) {
 		return "", err
 	}
 	return string(linebuf), nil
+}
+
+// Refesh sets need refresh state
+func (s *State) Refesh() {
+	s.needRefresh = true
 }

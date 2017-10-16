@@ -50,34 +50,35 @@ const (
 )
 
 const (
-	ctrlA = 1
-	ctrlB = 2
-	ctrlC = 3
-	ctrlD = 4
-	ctrlE = 5
-	ctrlF = 6
-	ctrlG = 7
-	ctrlH = 8
-	tab   = 9
-	lf    = 10
-	ctrlK = 11
-	ctrlL = 12
-	cr    = 13
-	ctrlN = 14
-	ctrlO = 15
-	ctrlP = 16
-	ctrlQ = 17
-	ctrlR = 18
-	ctrlS = 19
-	ctrlT = 20
-	ctrlU = 21
-	ctrlV = 22
-	ctrlW = 23
-	ctrlX = 24
-	ctrlY = 25
-	ctrlZ = 26
-	esc   = 27
-	bs    = 127
+	ctrlA    = 1
+	ctrlB    = 2
+	ctrlC    = 3
+	ctrlD    = 4
+	ctrlE    = 5
+	ctrlF    = 6
+	ctrlG    = 7
+	ctrlH    = 8
+	tab      = 9
+	lf       = 10
+	ctrlK    = 11
+	ctrlL    = 12
+	cr       = 13
+	ctrlN    = 14
+	ctrlO    = 15
+	ctrlP    = 16
+	ctrlQ    = 17
+	ctrlR    = 18
+	ctrlS    = 19
+	ctrlT    = 20
+	ctrlU    = 21
+	ctrlV    = 22
+	ctrlW    = 23
+	ctrlX    = 24
+	ctrlY    = 25
+	ctrlZ    = 26
+	esc      = 27
+	question = 63
+	bs       = 127
 )
 
 const (
@@ -845,6 +846,10 @@ mainLoop:
 			case tab: // Tab completion
 				line, pos, next, err = s.tabComplete(p, line, pos)
 				goto haveNext
+			case question: // Help callback
+				fmt.Println("")
+				s.helpText(line)
+				s.needRefresh = true
 			// Catch keys that do nothing, but you don't want them to beep
 			case esc:
 				// DO NOTHING
@@ -1126,4 +1131,10 @@ func (s *State) tooNarrow(prompt string) (string, error) {
 		defer func() { s.r = nil }()
 	}
 	return s.promptUnsupported(prompt)
+}
+
+func (s *State) helpText(line []rune) {
+	if s.helpProvider != nil {
+		s.helpProvider(string(line))
+	}
 }
